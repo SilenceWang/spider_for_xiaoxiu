@@ -5,6 +5,7 @@ import urllib2
 import re
 import sys
 import random
+from os.path import getsize
 
 class Spider_base:
 	"""
@@ -24,7 +25,33 @@ class Spider_base:
 		"""
 			start spider. I split it to three step 
 		"""
-		self.get_url_resp()
+		pass
+
+	def get_all_image_url(self):
+		"""
+			取得网站中的图片
+		"""
+		pass
+
+	def save_iamge_local(self, url, minSize=0):
+		"""
+			save image file to local as name wifh last path
+		"""
+		resp = self.get_url_resp()
+		if minSize > 0 and getsize(resp) >minSize:
+			try:
+				filename = url.split("/")[-1]
+				if Utils.is_jpg(resp):
+					filename += ".jpg"
+				else:
+					filename += ".png"
+				f = file(filename,'w')
+				f.write(resp)
+			except Exception, e:
+				print "save filename[%s] to local is failed! \n %s"%(filename, e)
+			finally:
+				if not f:
+					f.close()
 
 	def get_url_resp(self):
 		"""
