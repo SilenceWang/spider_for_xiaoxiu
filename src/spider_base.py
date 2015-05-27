@@ -5,6 +5,7 @@ import urllib2
 import re
 import sys
 import random
+import threading
 from os.path import getsize
 
 class Spider_base:
@@ -33,25 +34,6 @@ class Spider_base:
 		"""
 		pass
 
-	def save_iamge_local(self, url, minSize=0):
-		"""
-			save image file to local as name wifh last path
-		"""
-		resp = self.get_url_resp()
-		if minSize > 0 and getsize(resp) >minSize:
-			try:
-				filename = url.split("/")[-1]
-				if Utils.is_jpg(resp):
-					filename += ".jpg"
-				else:
-					filename += ".png"
-				f = file(filename,'w')
-				f.write(resp)
-			except Exception, e:
-				print "save filename[%s] to local is failed! \n %s"%(filename, e)
-			finally:
-				if not f:
-					f.close()
 
 	def get_url_resp(self):
 		"""
@@ -79,3 +61,37 @@ class Spider_base:
 		pageRex = re.compile(pattern_str)
 		pages = pageRex.findall(contents)
 		return pages	
+
+
+class Spider_img_mutilthread(threading.Thread):
+	"""
+		mutil thread for getting images
+	"""
+	def __init__(self, t_name, url):
+		threading.Thread.__init__(self, name = t_name)
+		self.url = url
+
+	def save_iamge_local(self, url, minSize=0):
+		"""
+			save image file to local as name wifh last path
+		"""
+		resp = self.get_url_resp()
+		if minSize > 0 and getsize(resp) >minSize:
+			try:
+				filename = url.split("/")[-1]
+				if Utils.is_jpg(resp):
+					filename += ".jpg"
+				else:
+					filename += ".png"
+				f = file(filename,'w')
+				f.write(resp)
+			except Exception, e:
+				print "save filename[%s] to local is failed! \n %s"%(filename, e)
+			finally:
+				if not f:
+					f.close()
+
+	def save_image_local_max(self, url):
+		"""
+			save the max image from website
+		"""
